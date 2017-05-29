@@ -42,7 +42,7 @@ function currentVals(str) {
 function readPFile(str) {
 	return fs.readFile(str, 'utf8',  function(err, data) {
 		return data
-	}
+	})
 }
 
 function getUpdatedPrices() {

@@ -22,5 +22,22 @@ function writePFile(str, obj) {
 }
 
 function getPortTotalWorth() {
+	let total = 0
+	new Promise((resolve, request) => {
+		resolve(readPFile('./public/staticFiles/portfolio.json'))
+	})
+	.then((res) => console.log(res))
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
