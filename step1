@@ -1,0 +1,83 @@
+#!/usr/bin/env node
+
+const fs = require('fs')
+const request = require('request-promise')
+const axios = require('axios');
+
+
+console.log('hi');
+
+function writeToFile(obj) {
+	new Promise((resolve, reject) => {
+		fs.readFile('./public/staticFiles/fund_prices.json', 'utf8', function(err, data){
+			resolve(data)
+		})	
+	})
+	.then((res) => JSON.parse(res))
+	.then((res) => {
+		let temp = res
+		temp.push(obj)
+		return temp
+	})
+	.then((res) => JSON.stringify(res))
+	.then((res) => {
+		console.log('####',res)
+		return res
+	})
+	.then((res) => {
+		fs.writeFile('./public/staticFiles/fund_prices.json', res)
+	})
+}
+
+function currentVals(str) {
+	const options = {
+		method: 'GET',
+		url: 'http://download.finance.yahoo.com/d/quotes.csv?s=%40%5EDJI,' + str + '&f=nsl1op&e=.csv'
+	}
+	return  new Promise((resolve, reject) => {
+		 resolve (axios(options))
+	})
+}
+
+function readPFile(str) {
+	return fs.readFile(str, 'utf8',  function(err, data) {
+		return data
+	}
+}
+
+function getUpdatedPrices() {
+	fs.readFile('./public/staticFiles/funds.json', 'utf8',  function(err, data) {
+		let arr = []
+		let val = (JSON.parse(data))
+		val.forEach((value) => {
+			currentVals(value.symbol)
+			.then((res) => {
+				return res.data
+			})
+			.then((res) => {
+				return (res.split(','))
+			})
+			.then((res) => {
+				for (let v = 0; v < res.length; v ++) {
+					if (!isNaN(res[v])) {
+						return JSON.parse(res[v])
+					}
+				}
+			})
+			.then((res) => arr.push({symbol: value.symbol, price: res }))
+			.then((res) => {
+				if(res === val.length) {
+					return arr	
+				}
+			})
+			.then((res) => JSON.stringify(res))
+			.then((res) => {
+				fs.writeFile('./public/staticFiles/fund_prices.json', res)
+			})
+		})  
+	})
+}
+
+getUpdatedPrices()
+
+

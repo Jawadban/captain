@@ -1,0 +1,26 @@
+#!/usr/bin/env node
+const resolve = require('resolve')
+
+function currentVals(str) {
+	const options = {
+		method: 'GET',
+		url: 'http://download.finance.yahoo.com/d/quotes.csv?s=%40%5EDJI,' + str + '&f=nsl1op&e=.csv'
+	}
+	return  new Promise((resolve, reject) => {
+		 resolve (axios(options))
+	})
+}
+
+function readPFile(str) {
+	return fs.readFile(str, 'utf8',  function(err, data) {
+		return data
+	})
+}
+
+function writePFile(str, obj) {
+	fs.writeFile(str, obj)
+}
+
+function getPortTotalWorth() {
+
+}
