@@ -25,22 +25,45 @@ function readPFile(str) {
 }
 
 function writePFile(str, obj) {
-	fs.writeFile(str, obj)
+	fs.writeFile(str, JSON.stringify(obj))
 }
 
-//function 
 
 function getPortTotalWorth() {
+	let counter = 0
 	let total = 0
 	new Promise((resolve, request) => {
 		resolve(readPFile('./public/staticFiles/portfolio.json'))
 	})
-	// .then((res) => JSON.parse(res))
-	.then((res) => res.map((dat) => {
-		let port = readPFile('./public/staticFiles/portfolio.json')
-		port.then((val) => console.log('val'))
+	.then((res) => res.map(( dat) => {
+		let port = readPFile('./public/staticFiles/funds.json')
+		port.then((val) => {
+			val.forEach((valFunds) => {
+				if(dat.symbol === valFunds.symbol) {
+					new Promise((fulfill, rej) => {
+						let fundsP = readPFile('./public/staticFiles/fund_prices.json')
+						fundsP
+						.then((valFundPrices) => {
+							valFundPrices.forEach((valFundPrice) => {
+								if(valFundPrice.symbol === dat.symbol) {
+									let totalSharePrice = dat.shares * valFundPrice.price
+									totalSharePrice = totalSharePrice
+									total = total + totalSharePrice
+									console.log(valFunds.name +':'+ dat.shares + ' shares at $' + valFundPrice.price + 
+										' ea. -- $' + totalSharePrice.toFixed(2))
+									if(counter === 5) {
+										console.log('Total: $', total) 
+									} else {
+										counter ++
+									}
+								}
+							})
+						})
+					})
+				}
+			})
+		})
 	}))
-	// .then((res) => console.log(res))
 }
 
 getPortTotalWorth()
