@@ -5,7 +5,6 @@ const request = require('request-promise')
 const axios = require('axios');
 
 
-console.log('hi');
 
 function writeToFile(obj) {
 	new Promise((resolve, reject) => {
@@ -81,3 +80,4 @@ function getUpdatedPrices() {
 getUpdatedPrices()
 
 
+console.log('Updated fund prices in fund_prices.json');
