@@ -2,9 +2,6 @@
 
 const fs = require('fs')
 
-console.log('pi')
-const resolve = require('resolve')
-
 function currentVals(str) {
 	const options = {
 		method: 'GET',
@@ -52,7 +49,7 @@ function getPortTotalWorth() {
 									console.log(valFunds.name +':'+ dat.shares + ' shares at $' + valFundPrice.price + 
 										' ea. -- $' + totalSharePrice.toFixed(2))
 									if(counter === 5) {
-										console.log('Total: $', total) 
+										console.log('Total: $', total.toFixed(2)) 
 									} else {
 										counter ++
 									}
