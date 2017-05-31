@@ -54,7 +54,16 @@ so we dont have to read and write multiple files.
 
 # Step 3
 
-Input Step3 in the terminal which retrieves the relevant data from `combinedData.json` and render Asset Breakdown.
+Input Step3 in the terminal which retrieves the relevant data from `combinedData.json` and render Asset Breakdown in from:
+
+```
+$ Step3
+Asset Class Breakdown
+  U.S. Stocks: 43.78%
+  U.S. Bonds: 25.46%
+  International Bonds: 8.99%
+  International Stocks: 21.76%
+```
 
 
 
