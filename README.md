@@ -31,7 +31,7 @@ npm start
 # Step1 
 
 Input Step1 in the terminal once you are at the root directory.
-This will save the current price for the share.
+This will save the current price for the share in `fund_prices.json`.
 
 # Step 2
 
