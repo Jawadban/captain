@@ -9543,7 +9543,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 _reactDom2.default.render(_react2.default.createElement(
 	'h1',
 	null,
-	'Jawad is here'
+	'React is working'
 ), document.getElementById('root'));
 
 /***/ }),

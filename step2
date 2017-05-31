@@ -2,16 +2,6 @@
 
 const fs = require('fs')
 
-function currentVals(str) {
-	const options = {
-		method: 'GET',
-		url: 'http://download.finance.yahoo.com/d/quotes.csv?s=%40%5EDJI,' + str + '&f=nsl1op&e=.csv'
-	}
-	return  new Promise((resolve, reject) => {
-		 resolve (axios(options))
-	})
-}
-
 function readPFile(str) {
 	return new Promise ((resolve, reject) => {
 		fs.readFile(str, 'utf8',  function(err, data) {
@@ -29,6 +19,7 @@ function writePFile(str, obj) {
 function getPortTotalWorth() {
 	let counter = 0
 	let total = 0
+	let arr = []
 	new Promise((resolve, request) => {
 		resolve(readPFile('./public/staticFiles/portfolio.json'))
 	})
@@ -44,14 +35,17 @@ function getPortTotalWorth() {
 							valFundPrices.forEach((valFundPrice) => {
 								if(valFundPrice.symbol === dat.symbol) {
 									let totalSharePrice = dat.shares * valFundPrice.price
-									totalSharePrice = totalSharePrice
 									total = total + totalSharePrice
 									console.log(valFunds.name +':'+ dat.shares + ' shares at $' + valFundPrice.price + 
 										' ea. -- $' + totalSharePrice.toFixed(2))
 									if(counter === 5) {
 										console.log('Total: $', total.toFixed(2)) 
+										writePFile('./public/staticFiles/combinedData.json', arr)
 									} else {
 										counter ++
+										arr.push({"symbol": valFundPrice.symbol, "name": valFunds.name, 
+											"shares": dat.shares, "price": valFundPrice.price, 
+											"totalPrice": totalSharePrice, "assetClass": valFunds.assetClass})
 									}
 								}
 							})
@@ -65,15 +59,7 @@ function getPortTotalWorth() {
 
 getPortTotalWorth()
 
-function foo() {
-	console.log('foo now')
-}
 
 
 
-
-
-
-
-
-
+exports.getPortTotalWorth = getPortTotalWorth

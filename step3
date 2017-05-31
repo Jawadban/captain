@@ -1,2 +1,39 @@
 #!/usr/bin/env node
+const fs = require('fs')
 
+function readPFile(str) {
+	return new Promise ((resolve, reject) => {
+		fs.readFile(str, 'utf8',  function(err, data) {
+			resolve(data)
+		})
+	})
+	.then((res) => JSON.parse(res))
+}
+
+function writePFile(str, obj) {
+	fs.writeFile(str, JSON.stringify(obj))
+}
+
+function assetBreakdown(total, obj) {
+	console.log('Asset Class Breakdown') 
+	for (var val in obj) {
+		console.log("  " + val + ": " + ((obj[val]/total)*100).toFixed(2) +'%')
+	}
+}
+
+function Step3() {
+	let total = 0
+	let obj = {}
+	readPFile('./public/staticFiles/combinedData.json')
+	.then((res) => res.forEach((dat) => { 
+		total = total + dat.totalPrice
+		if(obj.hasOwnProperty(dat.assetClass)) {
+			obj[dat.assetClass] += dat.totalPrice
+		} else {
+			obj[dat.assetClass] = dat.totalPrice
+		}
+	}))
+	.then((res) => assetBreakdown(total, obj))
+} 
+
+Step3()

@@ -8,6 +8,7 @@ const router = express.Router()
 const request = require('request-promise')
 // import funds from './public/staticFiles/funds.json'
 const fs = require('fs')
+const axios = require('axios')
 
 const url = 'mongodb://localhost:port27017/test'
 
@@ -35,139 +36,110 @@ app.set('views', __dirname +'/views')
 
 app.set('view engine', 'pug')
 
+function readPFile(str) {
+	return new Promise ((resolve, reject) => {
+		fs.readFile(str, 'utf8',  function(err, data) {
+			resolve(data)
+		})
+	})
+	.then((res) => JSON.parse(res))
+}
+
+function writePFile(str, obj) {
+	fs.writeFile(str, JSON.stringify(obj))
+}
+
 function currentVals(str) {
-	let values = ''
 	const options = {
 		method: 'GET',
-		uri: 'http://download.finance.yahoo.com/d/quotes.csv?s=%40%5EDJI,' + str + '&f=nsl1op&e=.csv'
+		url: 'http://download.finance.yahoo.com/d/quotes.csv?s=%40%5EDJI,' + str + '&f=nsl1op&e=.csv'
 	}
-	return request(options)
-	.then( (response) => {
-		values = response
-		console.log(response)
-		return response
+	return  new Promise((resolve, reject) => {
+		 resolve (axios(options))
 	})
 }
 
-function writeToFile(obj) {
-	console.log(obj);
-	fs.readFile('./public/staticFiles/fund_prices.json', 'utf8', function(err, data){
-		let fileDat = JSON.parse(data)
-		fileDat.push(obj)
-		let json = JSON.stringify(fileDat);
-		fs.writeFile('./public/staticFiles/fund_prices.json', json, 
-			function(err){
-		    if(err) throw err;
-		  }
-		)
-	})
-}
-
-app.get('/writeData', () => writeToFile(['dkfj', 'slsl']))
-
-function readJSONFile(filename) {
-	return new Promise((resolve, reject) => {
-		fs.readFile('./public/staticFiles/funds.json', (err, data) => {
-			// if (err) reject (err)
-			resolve(JSON.parse(data))
-		})
-	})
-	
-    // return fs.readFile(filename, 'utf8',  (err, data) => JSON.parse(data))
-  
-
-  // .then((data) => {
-  // 	//console.log(data)
-  // 	dataArr = data
-  // })
-  
-
-	// let fileData = []
-	// fs.readFile('./public/staticFiles/funds.json', function(err, data){
-	// 	// console.log(JSON.parse(data))
-	// 	fileData = JSON.parse(data)
-
-	// 	// console.log(fileData)
-	// 	// res.setHeader('content-type', 'text/html')
-	// 	// res.send(fileData)
-	// })
-	// writeToFile(fileData)
-	// return fileData
-}
-
-
-
-function readAndWriteFile(reading) {
-
-}
-
-
-
-
-app.get('/writeUpdate', function(req, res){
-	let val = new Promise(function (resolve, reject){
-		readJSONFile('./public/staticFiles/funds.json').then(function(response){
-			resolve(response)
-		})
-	})
-
-	console.log(val)
-
-
+app.get('/Step1', (request, response) => {
 	fs.readFile('./public/staticFiles/funds.json', 'utf8',  function(err, data) {
-		let val = (JSON.parse(data))   
-		console.log(val)
+		let arr = []
+		let val = (JSON.parse(data))
+		val.forEach((value) => {
+			currentVals(value.symbol)
+			.then((res) => {
+				return res.data
+			})
+			.then((res) => {
+				return (res.split(','))
+			})
+			.then((res) => {
+				for (let v = 0; v < res.length; v ++) {
+					if (!isNaN(res[v])) {
+						return JSON.parse(res[v])
+					}
+				}
+			})
+			.then((res) => arr.push({symbol: value.symbol, price: res }))
+			.then((res) => {
+				if(res === val.length) {
+					return arr	
+				}
+			})
+			.then((res) => JSON.stringify(res))
+			.then((res) => {
+				fs.writeFile('./public/staticFiles/fund_prices.json', res)
+			})
+			.then(() => response.end('Updated prices'))
+		})  
 	})
-		// readJSONFile('./public/staticFiles/funds.json'))
-
-			// console.log(readJSONFile('./public/staticFiles/funds.json'))
-	// readFundsFile.then((response) => writeToFile(''))
 })
 
-app.get('/postData', function(req, res){
-	writeToFile({fire: 'Comey'})
-})
+app.get('/Step2', function(request, response){
+	function getPortTotalWorth() {
+		let counter = 0
+		let total = 0
+		let arr = []
+		new Promise((resolve, request) => {
+			resolve(readPFile('./public/staticFiles/portfolio.json'))
+		})
+		.then((res) => res.map(( dat) => {
+			let port = readPFile('./public/staticFiles/funds.json')
+			port.then((val) => {
+				val.forEach((valFunds) => {
+					if(dat.symbol === valFunds.symbol) {
+						new Promise((fulfill, rej) => {
+							let fundsP = readPFile('./public/staticFiles/fund_prices.json')
+							fundsP
+							.then((valFundPrices) => {
+								valFundPrices.forEach((valFundPrice) => {
+									if(valFundPrice.symbol === dat.symbol) {
+										let totalSharePrice = dat.shares * valFundPrice.price
+										total = total + totalSharePrice
+										response.send(valFunds.name +':'+ dat.shares + ' shares at $' + valFundPrice.price + 
+											' ea. -- $' + totalSharePrice.toFixed(2))
+										if(counter === 5) {
+											response.send('Total: $', total.toFixed(2)) 
+											writePFile('./public/staticFiles/combinedData.json', arr)
+										} else {
+											counter ++
+											arr.push({"symbol": valFundPrice.symbol, "name": valFunds.name, 
+												"shares": dat.shares, "price": valFundPrice.price, 
+												"totalPrice": totalSharePrice, "assetClass": valFunds.assetClass})
+										}
+									}
+								})
+							})
+						})
+					}
+				})
+			})
+		}))
+	}
 
+	getPortTotalWorth()
 
-
-
-
-app.get('/getData', function(req, res){
-	let fileData = []
-	fs.readFile('./public/staticFiles/funds.json', function(err, data){
-		// console.log(JSON.parse(data))
-		fileData = JSON.parse(data)
-		console.log(fileData)
-
-		res.setHeader('content-type', 'text/html')
-		res.send(fileData)
-	})
-		writeToFile(fileData)
-})
-
-
-
-
-app.get('/values', function(req, res) {
-	// const options = {
-	// 	method: 'GET',
-	// 	uri: 'http://download.finance.yahoo.com/d/quotes.csv?s=%40%5EDJI,'+'GOOG'+ '&f=nsl1op&e=.csv'
-	// }
-	let checkVals = new Promise((resolve, reject) => resolve(currentVals('VTSAX')))
-	checkVals.then( (response) => {
-		console.log(response)
-		// res.end(response)
-		res.send(response)
-	})
-	// res.redirect('/');
-})
-
-app.get('/obj', function(req, res){
-	res.send({name: 'Jaw'})
 })
 
 app.get('*', function(req, res){
-	  // res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
 	  res.render('index')
 })
 

@@ -32,7 +32,9 @@
     "nodemon": "^1.11.0"
   },
   "bin": {
+    "step1": "step1",
     "step2": "step2",
-    "step1": "step1"
+    "step3": "step3",
+    "step4": "step4"
   }
 }
