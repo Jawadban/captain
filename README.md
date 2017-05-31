@@ -21,7 +21,7 @@ for good and will not be available anymore so Steps4 and 5 will not run.
 
 # Builds and Side Quests
 
-React, Webpack, Babel and RESTful Express server is setup and working but 
+React, Webpack, Babel and RESTful Express server are setup and working but 
 sorry did not have much time to implement Web app. 
 
 You can start the Express Node server running React by:
@@ -72,7 +72,7 @@ for good and will not be available anymore so Steps4 and 5 will not run.
 
 # Builds and Side Quests
 
-React, Webpack, Babel and RESTful Express server is setup and working but 
+React, Webpack, Babel and RESTful Express server are setup and working but 
 sorry did not have much time to implement Web app. 
 
 
