@@ -1,7 +1,7 @@
 
-# Installing dependancies
+# Installing dependencies
 
-Please install dependancies by running:
+Please install dependencies by running:
 
 ```
 npm install
@@ -30,7 +30,7 @@ npm start
 ```
 # Step1 
 
-Input Step1 in the terminal once you are at the root directoy.
+Input Step1 in the terminal once you are at the root directory.
 This will save the current price for the share.
 
 # Step 2
