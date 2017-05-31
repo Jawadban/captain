@@ -10,7 +10,7 @@ npm install
 # Linking Step commands to node server
 
 In order to run the code by entering Step1, Step2,... in the 
-terminal run:
+terminal please run:
 ```
 npm link
 ```
@@ -19,10 +19,10 @@ npm link
 Yahoo Finance Api for historical quotes etc is offline 
 for good and will not be available anymore so Steps4 and 5 will not run.
 
-# Builds
+# Builds and Side Quests
 
-Sorry did not have much time to implement Web app but React, Webpack, Babel
-and RESTful Express server is working...
+React, Webpack, Babel and RESTful Express server is working but 
+sorry did not have much time to implement Web app. 
 
 You can start the Express Node server running React by:
 ```
